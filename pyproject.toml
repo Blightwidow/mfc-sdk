@@ -1,0 +1,51 @@
+[project]
+name = "mfc-sdk"
+version = "0.0.1"
+authors = [{ name = "Dammaretz Theo" }]
+description = "A Python SDK for the MyFly Club API"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICENCSE"]
+dependencies = [
+  "pytest>=8.3.5",
+  "python-dotenv>=1.1.0",
+  "requests>=2.32.3",
+  "requests-ratelimiter>=0.7.0",
+  "ruff>=0.11.10",
+]
+
+[project.urls]
+Homepage = "https://github.com/Blightwidow/myf-sdk"
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = ["E4", "E7", "E9", "F", "I", "UP"]
+ignore = []
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings, spaces for indents
+# and trailing commas.
+quote-style = "preserve"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+docstring-code-format = false
+docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
