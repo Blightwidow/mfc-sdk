@@ -1,4 +1,3 @@
-import inspect
 from dataclasses import dataclass
 from typing import Self
 
@@ -7,30 +6,39 @@ from mfc.client.myflyclub import mfc_client
 
 @dataclass
 class Feature:
-    """Class representing a feature of an airport.
+    """Class representing a feature of an airport."""
 
-    Attributes:
-        title (str): Title of the feature.
-        strength (int): Strength of the feature.
-        type (str): Type of the feature.
-    """
-
+    strength: int
     title: str
+    type: str
+
+@dataclass
+class AirportDestination:
+    """Class representing a destination airport."""
+
+    id: int
+    name: str
+    countryCode: str
     strength: int
     type: str
 
 
 @dataclass
 class Airport:
-    citiesServed: list[str]  # Seems to be unused
-    city: str
+    """Class representing an airport."""
+
+    championAirlineId: int | None
+    championAirlineName: str | None
+    contestingAirlineName: str | None
     countryCode: str
-    destinations: list[Self]
+    destinations: list[AirportDestination]
     features: list[Feature]
     iata: str
     icao: str
     id: int
     incomeLevel: int
+    isDomesticAirport: bool | None
+    isGateway: bool | None
     latitude: float
     longitude: float
     name: str
@@ -42,18 +50,6 @@ class Airport:
     size: int
     zone: str
 
-    championAirlineId: int | None = None
-    championAirlineName: str | None = None
-    contested: str | None = None
-    isGateway: bool | None = False
-    isDomesticAirport: bool | None = False
-
-    @classmethod
-    def from_dict(cls, env):
-        return cls(
-            **{k: v for k, v in env.items() if k in inspect.signature(cls).parameters}
-        )
-
 
 def all() -> list[Airport]:
     """Get all airports.
@@ -61,7 +57,49 @@ def all() -> list[Airport]:
         list[Airport]: A list of all airports.
     """
     raw_airports = mfc_client.get("/airports")
-    return [Airport(**airport) for airport in raw_airports]
+    return [
+        Airport(
+            id=airport.get("id"),
+            countryCode=airport.get("countryCode"),
+            destinations=[
+                AirportDestination(
+                    id=destination.get("id"),
+                    name=destination.get("name"),
+                    countryCode=destination.get("countryCode"),
+                    strength=destination.get("strength"),
+                    type=destination.get("type"),
+                )
+                for destination in airport.get("destinations", [])
+            ],
+            features=[
+                Feature(
+                    strength=feature.get("strength"),
+                    title=feature.get("title"),
+                    type=feature.get("type"),
+                )
+                for feature in airport.get("features", [])
+            ],
+            iata=airport.get("iata"),
+            icao=airport.get("icao"),
+            incomeLevel=airport.get("incomeLevel"),
+            latitude=airport.get("latitude"),
+            longitude=airport.get("longitude"),
+            name=airport.get("name"),
+            popElite=airport.get("popElite"),
+            popMiddleIncome=airport.get("popMiddleIncome"),
+            population=airport.get("population"),
+            radius=airport.get("radius"),
+            runwayLength=airport.get("runwayLength"),
+            size=airport.get("size"),
+            zone=airport.get("zone"),
+            championAirlineId=airport.get("championAirlineId"),
+            championAirlineName=airport.get("championAirlineName"),
+            contestingAirlineName=airport.get("contested"),
+            isGateway=airport.get("isGateway", False),
+            isDomesticAirport=airport.get("isDomesticAirport", False),
+        )
+        for airport in raw_airports
+    ]
 
 
 def id(id: int) -> Airport | None:

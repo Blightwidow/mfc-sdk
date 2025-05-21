@@ -21,9 +21,10 @@ def test_get():
     """Test the get method of MyFlyClubClient."""
     from mfc.client.myflyclub import mfc_client
 
-    response = mfc_client.get("/colors")
+    response = mfc_client.get("/current-cycle")
     assert isinstance(response, dict)
     assert bool(response)  # Check if the response is not empty
+    assert "cycle" in response  # Check if the cycle key is present
 
 
 def test_get_invalid_path():

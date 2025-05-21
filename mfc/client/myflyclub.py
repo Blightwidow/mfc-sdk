@@ -64,7 +64,7 @@ class _MyFlyClubClient:
 
         return cookie
 
-    def get(self, path: str) -> dict:
+    def request(self, method: str, path: str, payload: dict | None = None) -> dict:
         """Getter method to retrieve data from the API.
         Args:
             path (str): The API endpoint to retrieve data from, with a leading slash.
@@ -78,7 +78,7 @@ class _MyFlyClubClient:
             raise ValueError("Path must start with a leading slash.")
 
         if not self.id:
-            raise ValueError("Session cookie not found. Please login first.")
+            self.login()
 
         response = self.session.get(f"{self.base_url}/current-cycle")
         response.raise_for_status()
@@ -88,11 +88,19 @@ class _MyFlyClubClient:
         if cached_answer is not None:
             return cached_answer
 
-        response = self.session.get(f"{self.base_url}{path}")
+        response = self.session.request(
+            method=method, url=f"{self.base_url}{path}", json=payload
+        )
         response.raise_for_status()
         data = response.json()
         self.cache.set(cycle, path, data)
         return data
+
+    def get(self, path: str) -> dict:
+        return self.request("GET", path)
+
+    def post(self, path: str, payload: dict) -> dict:
+        return self.request("POST", path, payload)
 
 
 mfc_client = _MyFlyClubClient()
